@@ -1,0 +1,22 @@
+.form-group{
+    border-top: 5px solid grey;
+    width: 60%;
+    height:210px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.form-control{
+    height: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.bt-add {
+    margin-top: 10px;
+    width: 100px;
+    height: 20px;
+    text-align: center;
+}

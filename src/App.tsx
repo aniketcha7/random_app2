@@ -1,67 +1,110 @@
-import { useReducer, useRef, useState } from "react";
-import reducerFunction, { initalState } from "./store";
-import { UPDATE_BP, UPDATE_DBP, UPDATE_HR, UPDATE_PR, UPDATE_SBP, UPDATE_SR } from "./store/storeTypes";
+import React, { useEffect, useState } from 'react';
 
-const App = () => {
-    const selectRef: any = useRef();
-    const [state, despatch] = useReducer(reducerFunction, initalState)
-    const [healthInput, setHealthInput] = useState<number>(0);
-    const updateHealthData = () => {
-        console.log('selectRef', selectRef.current.value)
-        console.log('inputvalue', healthInput)
-        despatch({
-            payload: {value: healthInput},
-            type: selectRef.current.value
-        })
+import './App.css';
+import AddUser from './components/AddUser/AddUser';
+
+
+
+function App() {
+  let userData: any = [];
+  const [loading ,setLoading ] = useState(false);
+  const [httpError ,setHttpError ] = useState(
+    {
+      status: false,
+      msg: ''
     }
-    return (
-        <div className="width100">
-            <div>
-                <ul>
-                    <li >
-                        {state.BP.name} := {state.BP.value}
-                    </li>
-                    <li >
-                        {state.HR.name} := {state.HR.value}
-                    </li>
-                    <li >
-                        {state.SBP.name} := {state.SBP.value}
-                    </li>
-                    <li >
-                        {state.DBP.name} := {state.DBP.value}
-                    </li>
-                    <li >
-                        {state.PR.name} := {state.PR.value}
-                    </li>
-                    <li >
-                        {state.SR.name} := {state.SR.value}
-                    </li>
-                </ul>
-            </div>
+  );
+  const [users, setUsers] = useState([])
 
-            <div>
-                <form >
-                    <label >Choose a Health Data:</label>
-                    <br />
-                    <select name="healthData" id="healthData" ref={selectRef}>
-                        <option value={UPDATE_BP}>{state.BP.name}</option>
-                        <option value={UPDATE_HR}>{state.HR.name}</option>
-                        <option value={UPDATE_SBP}>{state.SBP.name}</option>
-                        <option value={UPDATE_DBP}>{state.DBP.name}</option>
-                        <option value={UPDATE_PR}>{state.PR.name}</option>
-                        <option value={UPDATE_SR}>{state.SR.name}</option>
-                    </select>
 
-                    <input type="number" 
-                    value={healthInput} 
-                    onChange={(e) => setHealthInput(parseInt(e.target.value))} />
-                    <br />
-                    <button type="button" onClick={() =>updateHealthData() }>submit</button>
-                </form>
+// const getAllUserAxios = async() =>  {
+//   try{
+    
+//   const response: any = await fetch("http://localhost:3001/users") //GET Method
 
-            </div>
-        </div>
-    );
+
+//   if( response.status === 200){
+//     console.log('response',response);
+//     setLoading(false)
+//     const jsonData = await response.json();
+//     console.log('jsonData',jsonData);
+//     setUsers(jsonData.allUsers)
+//   }else {
+//     setLoading(false);
+//     const jsonData = await response.json();
+//     setHttpError({status:true, msg: jsonData.msg})
+//   }
+//   }
+//   catch (error) {
+//     console.log('err catch',error)
+//     setLoading(false);
+//     setHttpError({status: true, msg: 'something went wrong'})
+//   }
+  
+ 
+
+// }
+
+
+
+const catchErr = (err: any) => {
+  console.log('err',err);
+};
+const getAllUserAxios = async () => {
+ 
+ const usersRes:any = await fetch('http://localhost:3001/users').catch(catchErr)
+ if(usersRes.status === 200){
+
+  const userData = await usersRes.json()
+  console.log('user userData', userData);
+  setUsers(userData.allUsers)
+  setLoading(false);
+ }else {
+  const userErr = await usersRes.json();
+  console.log('user else  json', userErr)
+  setLoading(false);
+  setHttpError({status: true, msg: userErr.msg})
+ }
+
+};
+
+  useEffect(() => {
+    setLoading(true);
+   setTimeout(() => {
+    
+
+   
+      getAllUserAxios();
+  
+
+
+   }, 1000);
+   
+
+  },[])
+
+
+  // console.log('userData', userData)
+  // console.log('users', users)
+const allUsersHTML = users.map((user: any, index) => {
+  return (
+    <p key={user.id}>
+     
+      User-{index} := {user.email}
+    </p>
+  )
+} )
+
+  return (
+    <div>
+      <p>Fetch HTTP</p>
+      {loading && <p>...Loading</p> }
+      {httpError.status && <p>{httpError.msg}</p> }
+      {allUsersHTML}
+
+      <AddUser getAllUserAxios={getAllUserAxios}/>
+    </div>
+  );
 }
 
 export default App;

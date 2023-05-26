@@ -1,0 +1,6 @@
+1) router :  home page / users 
+2) homePage : landing page
+3) context : reducer (users) / api 
+3) users: table format users 
+
+ 
